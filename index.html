@@ -1,11 +1,158 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Mi primera página</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mi Sitio Web - Catálogo</title>
+  <style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f8fafc;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .product-image {
+        height: 200px;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+    
+    .placeholder-image {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #e2e8f0;
+        color: #64748b;
+    }
+
+    /* Botón agregar */
+    #addProductBtn {
+      margin-bottom: 1rem;
+      padding: 0.75rem 1.5rem;
+      background-color: #4f46e5;
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    #addProductBtn:hover {
+      background-color: #4338ca;
+    }
+
+    /* Clases para modal y demás ya definidas en el código JS */
+  </style>
 </head>
 <body>
-  <h1>¡Hola, mundo!</h1>
-  <p>Esta es mi primera página publicada con GitHub Pages.</p>
-</body>
-</html>
+
+  <div class="container">
+    <h1>Catálogo de Productos</h1>
+    <button id="addProductBtn">Agregar Producto</button>
+
+    <!-- Filtros -->
+    <div class="mb-8 bg-white p-4 rounded-lg shadow-sm">
+        <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div class="w-full md:w-1/3">
+                <input type="text" id="searchInput" placeholder="Buscar productos..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div class="w-full md:w-1/3">
+                <select id="categoryFilter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option value="">Todas las categorías</option>
+                    <option value="Electrónica">Electrónica</option>
+                    <option value="Ropa">Ropa</option>
+                    <option value="Hogar">Hogar</option>
+                    <option value="Otros">Otros</option>
+                </select>
+            </div>
+            <div class="w-full md:w-1/3">
+                <select id="sortFilter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option value="default">Ordenar por</option>
+                    <option value="priceAsc">Precio: Menor a Mayor</option>
+                    <option value="priceDesc">Precio: Mayor a Menor</option>
+                    <option value="nameAsc">Nombre: A-Z</option>
+                    <option value="nameDesc">Nombre: Z-A</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Catálogo de productos -->
+    <div id="productCatalog" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <!-- Los productos se cargarán aquí dinámicamente -->
+        <div class="flex items-center justify-center col-span-full py-12 text-gray-500">
+            <p class="text-xl">No hay productos en el catálogo. ¡Agrega tu primer producto!</p>
+        </div>
+    </div>
+  </div>
+
+  <!-- Modal para agregar/editar producto -->
+  <div id="productModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 overflow-hidden">
+          <div class="bg-indigo-600 text-white px-6 py-4 flex justify-between items-center">
+              <h3 id="modalTitle" class="text-xl font-semibold">Agregar Nuevo Producto</h3>
+              <button id="closeModal" class="text-white hover:text-gray-200" title="Cerrar">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+              </button>
+          </div>
+          <form id="productForm" class="p-6">
+              <input type="hidden" id="productId">
+              <div class="mb-4">
+                  <label for="productName" class="block text-gray-700 font-medium mb-2">Nombre del Producto</label>
+                  <input type="text" id="productName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+              </div>
+              <div class="mb-4">
+                  <label for="productCategory" class="block text-gray-700 font-medium mb-2">Categoría</label>
+                  <select id="productCategory" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                      <option value="">Selecciona una categoría</option>
+                      <option value="Electrónica">Electrónica</option>
+                      <option value="Ropa">Ropa</option>
+                      <option value="Hogar">Hogar</option>
+                      <option value="Otros">Otros</option>
+                  </select>
+              </div>
+              <div class="mb-4">
+                  <label for="productPrice" class="block text-gray-700 font-medium mb-2">Precio</label>
+                  <div class="relative">
+                      <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">$</span>
+                      <input type="number" id="productPrice" min="0" step="0.01" class="w-full pl-8 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                  </div>
+              </div>
+              <div class="mb-4">
+                  <label for="productDescription" class="block text-gray-700 font-medium mb-2">Descripción</label>
+                  <textarea id="productDescription" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required></textarea>
+              </div>
+              <div class="mb-4">
+                  <label for="productImage" class="block text-gray-700 font-medium mb-2">Imagen (URL)</label>
+                  <input type="text" id="productImage" placeholder="https://ejemplo.com/imagen.jpg" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                  <p class="text-sm text-gray-500 mt-1">Deja en blanco para usar una imagen predeterminada</p>
+              </div>
+              <div class="flex justify-end gap-3">
+                  <button type="button" id="cancelButton" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">Cancelar</button>
+                  <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">Guardar Producto</button>
+              </div>
+          </form>
+      </div>
+  </div>
+
+  <!-- Modal de confirmación para eliminar -->
+  <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 overflow-hidden">
+          <div class="bg-red-600 text-white px-6 py-4">
+              <h3
