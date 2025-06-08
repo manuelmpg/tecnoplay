@@ -2,157 +2,130 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mi Sitio Web - Catálogo</title>
+  <title>Catálogo de Productos</title>
   <style>
-    body {
-        font-family: 'Poppins', sans-serif;
-        background-color: #f8fafc;
-        margin: 0;
-        padding: 0;
-    }
-    
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 1rem;
-    }
-
-    .product-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-    }
-    
-    .product-image {
-        height: 200px;
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-    }
-    
-    .placeholder-image {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: #e2e8f0;
-        color: #64748b;
-    }
-
-    /* Botón agregar */
-    #addProductBtn {
-      margin-bottom: 1rem;
-      padding: 0.75rem 1.5rem;
-      background-color: #4f46e5;
-      color: white;
-      border: none;
-      border-radius: 0.5rem;
-      cursor: pointer;
-      font-size: 1rem;
-    }
-
-    #addProductBtn:hover {
-      background-color: #4338ca;
-    }
-
-    /* Clases para modal y demás ya definidas en el código JS */
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; }
+    h1 { text-align: center; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f4f4f4; }
+    input, button { padding: 6px; margin: 4px 0; width: 100%; }
+    .form-group { margin-bottom: 12px; }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>Catálogo de Productos</h1>
-    <button id="addProductBtn">Agregar Producto</button>
+  <h1>Catálogo de Productos</h1>
 
-    <!-- Filtros -->
-    <div class="mb-8 bg-white p-4 rounded-lg shadow-sm">
-        <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div class="w-full md:w-1/3">
-                <input type="text" id="searchInput" placeholder="Buscar productos..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            </div>
-            <div class="w-full md:w-1/3">
-                <select id="categoryFilter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <option value="">Todas las categorías</option>
-                    <option value="Electrónica">Electrónica</option>
-                    <option value="Ropa">Ropa</option>
-                    <option value="Hogar">Hogar</option>
-                    <option value="Otros">Otros</option>
-                </select>
-            </div>
-            <div class="w-full md:w-1/3">
-                <select id="sortFilter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <option value="default">Ordenar por</option>
-                    <option value="priceAsc">Precio: Menor a Mayor</option>
-                    <option value="priceDesc">Precio: Mayor a Menor</option>
-                    <option value="nameAsc">Nombre: A-Z</option>
-                    <option value="nameDesc">Nombre: Z-A</option>
-                </select>
-            </div>
-        </div>
+  <table id="productosTabla">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Precio</th>
+        <th>Descripción</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Productos se mostrarán aquí -->
+    </tbody>
+  </table>
+
+  <h2 id="formTitulo">Agregar Producto</h2>
+  <form id="productoForm">
+    <div class="form-group">
+      <input type="text" id="nombre" placeholder="Nombre del producto" required />
     </div>
-
-    <!-- Catálogo de productos -->
-    <div id="productCatalog" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        <!-- Los productos se cargarán aquí dinámicamente -->
-        <div class="flex items-center justify-center col-span-full py-12 text-gray-500">
-            <p class="text-xl">No hay productos en el catálogo. ¡Agrega tu primer producto!</p>
-        </div>
+    <div class="form-group">
+      <input type="number" id="precio" placeholder="Precio" min="0" step="0.01" required />
     </div>
-  </div>
+    <div class="form-group">
+      <input type="text" id="descripcion" placeholder="Descripción" required />
+    </div>
+    <button type="submit">Guardar</button>
+    <button type="button" id="cancelarEditar" style="display:none;">Cancelar</button>
+  </form>
 
-  <!-- Modal para agregar/editar producto -->
-  <div id="productModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 overflow-hidden">
-          <div class="bg-indigo-600 text-white px-6 py-4 flex justify-between items-center">
-              <h3 id="modalTitle" class="text-xl font-semibold">Agregar Nuevo Producto</h3>
-              <button id="closeModal" class="text-white hover:text-gray-200" title="Cerrar">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-              </button>
-          </div>
-          <form id="productForm" class="p-6">
-              <input type="hidden" id="productId">
-              <div class="mb-4">
-                  <label for="productName" class="block text-gray-700 font-medium mb-2">Nombre del Producto</label>
-                  <input type="text" id="productName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
-              </div>
-              <div class="mb-4">
-                  <label for="productCategory" class="block text-gray-700 font-medium mb-2">Categoría</label>
-                  <select id="productCategory" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
-                      <option value="">Selecciona una categoría</option>
-                      <option value="Electrónica">Electrónica</option>
-                      <option value="Ropa">Ropa</option>
-                      <option value="Hogar">Hogar</option>
-                      <option value="Otros">Otros</option>
-                  </select>
-              </div>
-              <div class="mb-4">
-                  <label for="productPrice" class="block text-gray-700 font-medium mb-2">Precio</label>
-                  <div class="relative">
-                      <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">$</span>
-                      <input type="number" id="productPrice" min="0" step="0.01" class="w-full pl-8 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
-                  </div>
-              </div>
-              <div class="mb-4">
-                  <label for="productDescription" class="block text-gray-700 font-medium mb-2">Descripción</label>
-                  <textarea id="productDescription" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required></textarea>
-              </div>
-              <div class="mb-4">
-                  <label for="productImage" class="block text-gray-700 font-medium mb-2">Imagen (URL)</label>
-                  <input type="text" id="productImage" placeholder="https://ejemplo.com/imagen.jpg" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                  <p class="text-sm text-gray-500 mt-1">Deja en blanco para usar una imagen predeterminada</p>
-              </div>
-              <div class="flex justify-end gap-3">
-                  <button type="button" id="cancelButton" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">Cancelar</button>
-                  <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">Guardar Producto</button>
-              </div>
-          </form>
-      </div>
-  </div>
+  <script>
+    let productos = [];
+    let editIndex = -1;
 
-  <!-- Modal de confirmación para eliminar -->
-  <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 overflow-hidden">
-          <div class="bg-red-600 text-white px-6 py-4">
-              <h3
+    const tablaBody = document.querySelector('#productosTabla tbody');
+    const form = document.getElementById('productoForm');
+    const tituloForm = document.getElementById('formTitulo');
+    const cancelarBtn = document.getElementById('cancelarEditar');
+
+    function mostrarProductos() {
+      tablaBody.innerHTML = '';
+      productos.forEach((prod, i) => {
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+          <td>${prod.nombre}</td>
+          <td>$${prod.precio.toFixed(2)}</td>
+          <td>${prod.descripcion}</td>
+          <td>
+            <button onclick="editarProducto(${i})">Editar</button>
+            <button onclick="eliminarProducto(${i})">Eliminar</button>
+          </td>
+        `;
+        tablaBody.appendChild(fila);
+      });
+    }
+
+    function agregarProducto(producto) {
+      productos.push(producto);
+      mostrarProductos();
+    }
+
+    function editarProducto(index) {
+      editIndex = index;
+      const prod = productos[index];
+      document.getElementById('nombre').value = prod.nombre;
+      document.getElementById('precio').value = prod.precio;
+      document.getElementById('descripcion').value = prod.descripcion;
+      tituloForm.textContent = 'Editar Producto';
+      cancelarBtn.style.display = 'inline-block';
+    }
+
+    function eliminarProducto(index) {
+      productos.splice(index, 1);
+      mostrarProductos();
+      if (editIndex === index) {
+        cancelarEditar();
+      }
+    }
+
+    function cancelarEditar() {
+      editIndex = -1;
+      form.reset();
+      tituloForm.textContent = 'Agregar Producto';
+      cancelarBtn.style.display = 'none';
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const nombre = document.getElementById('nombre').value.trim();
+      const precio = parseFloat(document.getElementById('precio').value);
+      const descripcion = document.getElementById('descripcion').value.trim();
+
+      if (editIndex === -1) {
+        agregarProducto({ nombre, precio, descripcion });
+      } else {
+        productos[editIndex] = { nombre, precio, descripcion };
+        editIndex = -1;
+        tituloForm.textContent = 'Agregar Producto';
+        cancelarBtn.style.display = 'none';
+      }
+      form.reset();
+      mostrarProductos();
+    });
+
+    cancelarBtn.addEventListener('click', cancelarEditar);
+
+    // Mostrar vacío al inicio
+    mostrarProductos();
+  </script>
+
+</body>
+</html>
+
